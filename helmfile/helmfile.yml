@@ -1,0 +1,40 @@
+
+releases:
+  - name: api
+    chart: ./charts/api
+
+
+  - name: configmap
+    chart: ./charts/configmap
+
+
+  - name: explorer
+    chart: ./charts/explorer
+
+  
+  - name: monitoring
+    chart: ./charts/monitoring
+
+
+  - name: peers
+    chart: stable/peers
+ 
+
+  - name: certifcates
+    chart: ./charts/certifcates
+
+  - name: ca
+    chart: ./charts/ca
+	
+  - name: certificates
+    chart: ./charts/certifactes
+	
+	
+  - name: nfs
+    chart: ./charts/nfs
+	
+  - name: orderer
+    chart: ./charts/orderer
+	
+  - name: ingress
+    chart: ./charts/ingress

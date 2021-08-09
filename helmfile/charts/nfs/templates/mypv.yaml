@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: {{ .Values.mypv.pv.kind }}
+metadata:
+  name: {{ .Values.mypv.pv.name }}
+  labels:
+    type: {{ .Values.mypv.pv.labels }}
+spec:
+  storageClassName: {{ .Values.mypv.pv.storageclassname }}
+  capacity:
+    storage: {{ .Values.mypv.pv.storage }}
+  accessModes:
+    - {{ .Values.mypv.pv.accessmode }}
+  hostPath:
+    path: {{ .Values.mypv.pv.path }}
+---
+apiVersion: v1
+kind: {{ .Values.mypv.pvc.kind }}
+metadata:
+  name: {{ .Values.mypv.pvc.name }}
+spec:
+  storageClassName: {{ .Values.mypv.pvc.storageclassname }}
+  accessModes:
+    - {{ .Values.mypv.pvc.accessmode }}
+  resources:
+    requests:
+      storage: {{ .Values.mypv.pvc.storage }}

@@ -1,0 +1,28 @@
+replicacount: 1
+
+certs:
+  name: create-certs
+  parallelism: 1
+  completions: 1
+  container:
+      name: create-certs
+      image: hyperledger/fabric-ca-tools:latest
+      requests:
+        memory: "300Mi"
+        cpu: "300m"
+      limits:
+        memory: "500Mi"
+        cpu: "350m"
+        
+      volumeMounts:
+        - mountPath: /organizations
+          name: fabricfiles
+          subPath: organizations    
+        - mountPath: /scripts
+          name: fabricfiles
+          subPath: scripts  
+        
+  restartpolicy: Never     
+  volume:
+    name: fabricfiles
+    claimname: mypvc

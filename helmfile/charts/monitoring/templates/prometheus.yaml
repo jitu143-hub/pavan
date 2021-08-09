@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.prometheus.name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.prometheus.labels }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.prometheus.labels }}
+    spec:
+      volumes:
+        - name:  prometheus-config
+          configMap:
+            name: monitoring-config
+            items:
+              - key: prometheus.yml
+                path: prometheus.yml
+      containers:
+      - name: {{ .Values.prometheus.container.name }}
+        image: {{ .Values.prometheus.container.image }}
+        resources:
+          limits:
+            memory: "{{ .Values.prometheus.container.limits.memory }}"
+            cpu: "{{ .Values.prometheus.container.limits.cpu }}"
+        ports:
+          {{- range $k, $v := .Values.prometheus.container.ports }} 
+              - {{ . | toYaml | indent 17 | trim }}
+             {{- end }}
+        volumeMounts:
+          {{- range $k, $v := .Values.prometheus.container.volumeMounts }} 
+               - {{ . | toYaml | indent 17 | trim }}
+              {{- end }} 
+
+
+
+
+
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.prometheus.service.name }}
+spec:
+  selector:
+    app: {{ .Values.prometheus.service.labels }}
+  ports:
+     {{- range $k, $v := .Values.prometheus.service.ports }} 
+      - {{ . | toYaml | indent 8 | trim }}
+     {{- end }}

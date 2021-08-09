@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: {{ .Values.pv.kind }}
+metadata:
+  name: {{ .Values.pv.name }}
+spec:
+  storageClassName: standard
+  capacity:
+    storage: {{ .Values.pv.storage }}
+  volumeMode: {{ .Values.pv.volumemode }}
+  accessModes:
+    - {{ .Values.pv.accessmode }}
+  nfs:
+    path: {{ .Values.pv.path }}
+    server: {{ .Values.pv.server }}
+   

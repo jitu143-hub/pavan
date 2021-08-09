@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.org3.service.name }}
+  
+  labels:
+    app: {{ .Values.org3.service.labels }}
+spec:
+  type: {{ .Values.org3.service.type }}
+  selector:
+    app: {{ .Values.org3.service.labels }}
+  ports:
+    - protocol: {{ .Values.org3.service.ports.protocol }}
+      targetPort: {{ .Values.org3.service.ports.targetport }}
+      port: {{ .Values.org3.service.ports.port }}

@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: {{ .Values.orderer.name }}
+spec:
+    selector:
+        matchLabels:
+            name: {{ .Values.orderer.labels }}
+    replicas: {{ .Values.replicacount }}
+    template:
+        metadata:
+            labels:
+                name: {{ .Values.orderer.labels }}
+        spec:
+           volumes:
+             - name: {{ .Values.orderer.volume.name }}
+               persistentVolumeClaim:
+                  claimName: {{ .Values.orderer.volume.claimname }}
+           containers:
+             - image: {{ .Values.orderer.container.image }}
+               name: {{ .Values.orderer.container.name }}
+               workingDir: {{ .Values.orderer.container.workingDir }}
+               command: ["orderer"]
+               imagePullPolicy: {{ .Values.orderer.container.imagepullpolicy }}
+               env:
+                  {{- range $k, $v := .Values.orderer.container.env }}
+                   - {{ . | toYaml | indent 21 | trim }}
+                  {{- end }} 
+               resources:
+                 limits:
+                    memory: "{{ .Values.orderer.container.limits.memory }}"
+                    cpu: "{{ .Values.orderer.container.limits.cpu }}"
+                 requests:
+                    memory: "{{ .Values.orderer.container.requests.memory }}"
+                    cpu: "{{ .Values.orderer.container.requests.cpu }}"              
+               
+               volumeMounts:
+                 {{- range $k, $v := .Values.orderer.volume.volumeMounts }} 
+                 - {{ . | toYaml | indent 19 | trim }}
+                 {{- end }} 

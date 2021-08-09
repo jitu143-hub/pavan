@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.explorerdb.name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.explorerdb.labels }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.explorerdb.labels }}
+    spec:
+      containers:
+      - name: {{ .Values.explorerdb.container.name }}
+        image: {{ .Values.explorerdb.container.image }}
+        env:
+          {{- range $k, $v := .Values.explorerdb.container.env }} 
+           - {{ . | toYaml | indent 13 | trim }}
+          {{- end }} 
+        resources:
+          limits:
+            memory: "{{ .Values.explorerdb.container.limits.memory }}"
+            cpu: "{{ .Values.explorerdb.container.limits.cpu }}"
+        ports:
+        - containerPort: "{{ .Values.explorerdb.container.ports.containerPort }}"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.explorerdb.service.name }}
+spec:
+  selector:
+    app: {{ .Values.explorerdb.service.labels }}
+  ports:
+       {{- range $k, $v := .Values.explorerdb.service.ports }}
+        - {{ . | toYaml | indent 10 | trim }}
+       {{- end }} 
+

@@ -1,0 +1,68 @@
+grafana:
+  name: grafana
+  labels: grafana
+  container:
+      name: grafana
+      image: grafana/grafana:latest
+      limits:
+        memory: "128Mi"
+        cpu   : "500m"
+      env:
+            - name: GF_PATHS_PROVISIONING
+              value: /var/lib/grafana/provisioning/
+
+      ports:
+            - containerPort: 3000
+      
+      volumeMounts:
+            - mountPath: /var/lib/grafana/provisioning/datasources/datasource.yml
+              name: grafana-config
+              subPath: datasource.yml
+            - mountPath:  /var/lib/grafana/provisioning/dashboards/hlf/dashboard.json
+              name: grafana-config
+              subPath: dashboard.json
+            - mountPath: /var/lib/grafana/provisioning/dashboards/dashboard.yaml
+              name: grafana-config
+              subPath: dashboard.yaml
+  
+  service:
+    name: grafana
+    selector:
+    labels: grafana
+    ports:
+       - port: 3000
+         targetport: 3000
+
+
+
+
+
+
+
+
+
+
+
+prometheus:
+  name: prometheus
+  labels: prometheus
+  container:
+    name: prometheus
+    image: prom/prometheus:latest
+    limits:
+        memory: "128Mi"
+        cpu: "300m"        
+    ports:
+            - containerPort: 9090
+    volumeMounts:
+            - mountPath: /etc/prometheus/prometheus.yml
+              name: prometheus-config
+              subPath: prometheus.yml
+
+
+  service:
+    name : prometheus
+    labels  : prometheus
+    ports:
+        - port: 9090
+          targetport: 9090

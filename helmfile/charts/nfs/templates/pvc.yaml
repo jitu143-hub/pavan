@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: {{ .Values.pvc.kind }}
+metadata:
+  name: {{ .Values.pvc.name }}
+spec:
+  storageClassName: standard
+  accessModes:
+    - {{ .Values.pvc.accessmode }}
+  resources:
+    requests:
+      storage: {{ .Values.pvc.storage }}

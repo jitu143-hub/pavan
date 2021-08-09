@@ -1,0 +1,162 @@
+replicacount: 1
+
+orderer:
+  name: ca-orderer
+  labels: ca-orderer
+  container:
+      name: ca-orderer
+      image: hyperledger/fabric-ca:latest
+      imagepullpolicy: "IfNotPresent"
+      requests:
+        memory: "300Mi"
+        cpu: "300m"
+      limits:
+        memory: "500Mi"
+        cpu: "350m"
+      env:
+        - name: FABRIC_CA_SERVER_CA_NAME
+          value: ca-orderer
+        - name: FABRIC_CA_SERVER_TLS_ENABLED
+          value: "true"
+        - name: FABRIC_CA_SERVER_CSR_HOSTS
+          value: "ca-orderer"    
+        - name: FABRIC_CA_SERVER_CSR_CN
+          value: "ca-orderer"         
+      
+  volume:
+    name: data
+    mountpath: /etc/hyperledger/fabric-ca-server
+    subpath: organizations/fabric-ca/ordererOrg
+    claimname: mypvc
+    
+  service:
+    name: ca-orderer
+    labels: ca-orderer
+    type: ClusterIP
+    ports:
+       protocol: TCP
+       targetport: 10054
+       port: 10054       
+ 
+ 
+ 
+org1:
+  name: ca-org1
+  labels: ca-org1
+  container:
+      name: ca-org1
+      image: hyperledger/fabric-ca:latest
+      imagepullpolicy: "Always"
+      requests:
+        memory: "300Mi"
+        cpu: "250m"
+      limits:
+        memory: "400Mi"
+        cpu: "350m"
+      env:
+        - name: FABRIC_CA_SERVER_CA_NAME
+          value: ca-org1
+        - name: FABRIC_CA_SERVER_TLS_ENABLED
+          value: "true"
+        - name: FABRIC_CA_SERVER_CSR_CN
+          value: "ca-org1"
+        - name: FABRIC_CA_SERVER_CSR_HOSTS
+          value: "ca-org1"
+      
+  volume:
+    name: data
+    mountpath: /etc/hyperledger/fabric-ca-server
+    subpath: organizations/fabric-ca/org1
+    claimname: mypvc
+    
+  service:
+    kind: Service
+    name: ca-org1
+    labels: ca-org1
+    type: ClusterIP
+    ports:
+      protocol: TCP
+      targetPort: 7054
+      port: 7054
+        
+        
+        
+org2:
+  name: ca-org2
+  labels: ca-org2
+  container:
+      name: ca-org2
+      image: hyperledger/fabric-ca:latest
+      imagepullpolicy: "Always"
+      requests:
+        memory: "300Mi"
+        cpu: "300m"
+      limits:
+        memory: "500Mi"
+        cpu: "350m"
+      env:
+        - name: FABRIC_CA_SERVER_CA_NAME
+          value: ca-org2
+        - name: FABRIC_CA_SERVER_TLS_ENABLED
+          value: "true"
+        - name: FABRIC_CA_SERVER_CSR_CN
+          value: "ca-org2"
+        - name: FABRIC_CA_SERVER_CSR_HOSTS
+          value: "ca-org2"       
+      
+  volume:
+    name: data
+    mountpath: /etc/hyperledger/fabric-ca-server
+    subpath: organizations/fabric-ca/org2
+    claimname: mypvc
+    
+  service:
+    kind: Service
+    name: ca-org2
+    labels: ca-org2
+    type: ClusterIP
+    ports:
+      protocol: TCP
+      targetport: 8054
+      port: 8054 
+        
+        
+org3:
+  kind: Deployment
+  name: ca-org3
+  labels: ca-org3
+  container:
+      name: ca-org3
+      image: hyperledger/fabric-ca:latest
+      imagepullpolicy: "Always"
+      requests:
+        memory: "300Mi"
+        cpu: "300m"
+      limits:
+        memory: "500Mi"
+        cpu: "350m"
+      env:
+        - name: FABRIC_CA_SERVER_CA_NAME
+          value: ca-org3
+        - name: FABRIC_CA_SERVER_TLS_ENABLED
+          value: "true"
+        - name: FABRIC_CA_SERVER_CSR_CN
+          value: "ca-org3"
+        - name: FABRIC_CA_SERVER_CSR_HOSTS
+          value: "ca-org3"
+      
+  volume:
+    name: data
+    mountpath: /etc/hyperledger/fabric-ca-server
+    subpath: organizations/fabric-ca/org3
+    claimname: mypvc
+    
+  service:
+    kind: Service
+    name: ca-org3
+    labels: ca-org3
+    type: ClusterIP
+    ports:
+       protocol: TCP
+       targetport: 9054
+       port: 9054 

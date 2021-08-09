@@ -1,0 +1,137 @@
+ingress:
+  name: ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  tls:
+    - hosts:
+        - hlf-k8.tk
+        - api.hlf-k8.tk
+        - explorer.hlf-k8.tk
+        - grafana.hlf-k8.tk
+      secretName: tls-cert
+  rules:
+    - host: hlf-k8.tk
+      paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 80
+    - host: api.hlf-k8.tk
+      paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api
+                port:
+                  number: 4000
+
+
+    - host: explorer.hlf-k8.tk
+      paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: explorer
+                port:
+                  number: 8080
+
+
+    - host: grafana.hlf-k8.tk
+      paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: grafana
+                port:
+                  number: 3000
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+   
+   
+   
+   
+   
+   
+   
+ingresslocal:
+  name: ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    #nginx.ingress.kubernetes.io/rewrite-target: /$2
+    #cert-manager.io/cluster-issuer: "letsencrypt-prod"
+
+  rules:
+    - host: explorer.localhost
+      paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: explorer
+                port:
+                  number: 8080
+#          - path: /
+#            pathType: Prefix
+#            backend:
+#              service:
+#                name: explorer
+#                port:
+#                  number: 8080
+    - host: api.localhost
+      paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api
+                port:
+                  number: 4000
+    - host: ui.localhost
+      paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 80                                   
+#          - path: /grafana
+#            pathType: Prefix
+#            backend:
+#              service:
+#                name: grafana
+#                port:
+#                  number: 3000 
+
+
+
+
+
+
+
+issuer:
+    name: letsencrypt-prod
+    namespace: cert-manager
+    acme:
+      # The ACME server URL
+      server: https://acme-v02.api.letsencrypt.org/directory
+      # Email address used for ACME registration
+      email: adityaprakashjoshi1@gmail.com
+      # Name of a secret used to store the ACME account private key
+      privateKeySecretRef:
+        name: letsencrypt-prod
+        # Enable the HTTP-01 challenge provider
+      solvers:
+          class: nginx

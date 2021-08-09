@@ -1,0 +1,84 @@
+replicacount: 1
+
+explorer:
+  name: explorer
+  labels: explorer
+  container:
+      name: explorer
+      image: hyperledger/explorer:latest
+      limits:
+        memory: "528Mi"
+        cpu: "400m"
+      env:
+            - name: DATABASE_HOST
+              value: "explorerdb-service"
+            - name: DATABASE_DATABASE
+              value: "fabricexplorer"
+            - name: DATABASE_USERNAME
+              value: "hppoc"
+            - name: DATABASE_PASSWD
+              value: "password"
+            - name: LOG_LEVEL_APP
+              value: "debug"
+            - name: LOG_LEVEL_DB
+              value: "debug"
+            - name: LOG_LEVEL_CONSOLE
+              value: "info"
+            - name: LOG_CONSOLE_STDOUT
+              value: "true"
+            - name: DISCOVERY_AS_LOCALHOST
+              value: "false"   
+      ports: 
+        containerPort: 8080          
+      
+      volumeMounts:
+            - mountPath: /organizations
+              name: fabricfiles
+              subPath: organizations
+            - mountPath: /opt/explorer/app/platform/fabric/config.json
+              name: explorer-config
+              subPath: config.json  
+            - mountPath: /opt/explorer/app/platform/fabric/first-network.json
+              name: explorer-config
+              subPath: network.json 
+    
+  service:
+    name: explorer
+    labels: explorer
+    ports:
+     - port: 8080
+       targetPort: 8080      
+       
+       
+       
+       
+       
+       
+       
+explorerdb:
+  name: explorer-db
+  labels: explorer-db
+  container:
+      name: explorer-db
+      image: hyperledger/explorer-db:latest
+      limits:
+        memory: "528Mi"
+        cpu: "400m"
+      env:
+          - name: DATABASE_DATABASE
+            value: fabricexplorer
+          - name: DATABASE_USERNAME
+            value: hppoc
+          - name: DATABASE_PASSWORD
+            value: password
+      ports: 
+        containerPort: 5432          
+      
+    
+  service:
+    name: explorerdb-service
+    labels: explorer-db
+    ports:
+     - port: 5432
+       targetPort: 5432      
+ 

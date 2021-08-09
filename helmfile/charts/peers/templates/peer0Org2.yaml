@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.peer0org2.name }}
+spec:
+  selector:
+    matchLabels:
+      name: {{ .Values.peer0org2.labels }}
+  replicas: {{ .Values.replicacount }}
+  template:
+    metadata:
+      labels:
+        name: {{ .Values.peer0org2.labels }}
+    spec:
+      volumes:
+        - name: fabricfiles
+          persistentVolumeClaim:
+            claimName: mypvc
+        - name: builders-config
+          configMap:
+            name: builders-config
+            items:
+              - key: core.yaml
+                path: core.yaml
+        - name: external-builder-detect
+          configMap:
+            name: builders-config
+            items:
+              - key: detect
+                path: detect
+                mode: 0544
+        - name: external-builder-build
+          configMap:
+            name: builders-config
+            items:
+              - key: build
+                path: build
+                mode: 0544
+        - name: external-builder-release
+          configMap:
+            name: builders-config
+            items:
+              - key: release
+                path: release
+                mode: 0544
+      containers:
+        - name: {{ .Values.peer0org2.container1.name }}
+          image: {{ .Values.peer0org2.container1.image }}
+          command: ["sh", "-c", "peer node start"]
+          env:
+            {{- range $k, $v := .Values.peer0org2.container1.env }} 
+             - {{ . | toYaml | indent 15 | trim }}
+            {{- end }}
+          ports:    
+            {{- range $k, $v := .Values.peer0org2.container1.ports }} 
+             - {{ . | toYaml | indent 9 | trim }}
+            {{- end }}
+          resources:
+            limits:
+              memory: "{{ .Values.peer0org2.container1.limits.memory }}"
+              cpu: "{{ .Values.peer0org2.container1.limits.cpu }}"
+            requests:
+              memory: "{{ .Values.peer0org2.container1.requests.memory }}"
+              cpu: "{{ .Values.peer0org2.container1.requests.cpu }}"
+          volumeMounts:
+             {{- range $k, $v := .Values.peer0org2.container1.volumeMounts }} 
+              - {{ . | toYaml | indent 16 | trim }}
+             {{- end }} 
+
+
+
+        - name: {{ .Values.peer0org2.container2.name }}
+          image: {{ .Values.peer0org2.container2.image }}
+          resources:
+            limits:
+              memory: "{{ .Values.peer0org2.container2.limits.memory }}"
+              cpu: "{{ .Values.peer0org2.container2.limits.cpu }}"
+            requests:
+              memory: "{{ .Values.peer0org2.container2.requests.memory }}"
+              cpu: "{{ .Values.peer0org2.container2.requests.cpu }}"
+          volumeMounts:
+              {{- range $k, $v := .Values.peer0org2.container2.volumeMounts }} 
+                - {{ . | toYaml | indent 18 | trim }}
+              {{- end }} 

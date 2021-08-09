@@ -1,0 +1,14 @@
+kind: Service
+apiVersion: v1
+metadata:
+    name: {{ .Values.orderer4.service.name }}
+    labels:
+        run: {{ .Values.orderer4.service.labels }}
+spec:
+    selector:
+        name: {{ .Values.orderer4.service.name }}
+    type: {{ .Values.orderer4.service.type }}
+    ports:
+       {{- range $k, $v := .Values.orderer4.service.ports }} 
+       - {{ . | toYaml | indent 9 | trim }}
+       {{- end }} 

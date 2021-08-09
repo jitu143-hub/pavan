@@ -1,0 +1,450 @@
+replicacount: 1
+
+orderer:
+  name: orderer
+  labels: orderer
+  container:
+      name: orderer
+      image: hyperledger/fabric-orderer:2.3
+      workingDir: /opt/gopath/src/github.com/hyperledger/fabric
+      imagepullpolicy: IfNotPresent
+      requests:
+        memory: "200Mi"
+        cpu: "150m"
+      limits:
+        memory: "250Mi"
+        cpu: "250m"
+      env:
+                - name: FABRIC_LOGGING_SPEC
+                  value: INFO
+                #- name: CONFIGTX_ORDERER_ADDRESSES
+                #  value: "orderer:7050"
+                - name: ORDERER_GENERAL_LISTENADDRESS
+                  value: "0.0.0.0"
+                - name: ORDERER_GENERAL_LISTENPORT
+                  value: "7050"
+                - name: ORDERER_GENERAL_LOGLEVEL
+                  value: debug
+                - name: ORDERER_GENERAL_LOCALMSPDIR #
+                  value: /var/hyperledger/orderer/msp
+                - name: ORDERER_GENERAL_LOCALMSPID
+                  value: OrdererMSP
+                #- name: ORDERER_GENERAL_GENESISMETHOD
+                #  value: file
+                #- name: ORDERER_GENERAL_GENESISFILE
+                #  value: /system-genesis-block/genesis.block
+                - name: ORDERER_GENERAL_TLS_ENABLED
+                  value: "true"
+                - name: ORDERER_GENERAL_TLS_PRIVATEKEY
+                  value: /var/hyperledger/orderer/tls/server.key
+                - name: ORDERER_GENERAL_TLS_CERTIFICATE
+                  value: /var/hyperledger/orderer/tls/server.crt
+                - name: ORDERER_GENERAL_TLS_ROOTCAS
+                  value: /var/hyperledger/orderer/tls/ca.crt
+                - name:  ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY
+                  value: /var/hyperledger/orderer/tls/server.key
+                - name:  ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE
+                  value: /var/hyperledger/orderer/tls/server.crt
+                - name: ORDERER_GENERAL_CLUSTER_ROOTCAS 
+                  value: /var/hyperledger/orderer/tls/ca.crt
+                - name: ORDERER_GENERAL_BOOTSTRAPMETHOD
+                  value: none
+                - name: ORDERER_CHANNELPARTICIPATION_ENABLED
+                  value: "true"
+                - name: ORDERER_ADMIN_TLS_ENABLED
+                  value: "true"
+                - name: ORDERER_ADMIN_TLS_CERTIFICATE
+                  value: /var/hyperledger/orderer/tls/server.crt
+                - name: ORDERER_ADMIN_TLS_PRIVATEKEY
+                  value: /var/hyperledger/orderer/tls/server.key
+                - name: ORDERER_ADMIN_TLS_ROOTCAS
+                  value: /var/hyperledger/orderer/tls/ca.crt
+                - name: ORDERER_ADMIN_TLS_CLIENTROOTCAS
+                  value: /var/hyperledger/orderer/tls/ca.crt
+                - name: ORDERER_ADMIN_LISTENADDRESS
+                  value: "0.0.0.0:7053"        
+      
+  volume:
+    name: fabricfiles
+    claimname: mypvc
+    volumeMounts:
+                - name:  fabricfiles
+                  mountPath:  /organizations
+                  subPath: organizations
+          
+                - name: fabricfiles
+                  mountPath: /system-genesis-block
+                  subPath: system-genesis-block
+
+                - name: fabricfiles
+                  mountPath: /var/hyperledger/orderer/tls
+                  subPath: organizations/ordererOrganizations/example.com/orderers/orderer.example.com/tls
+                
+                - name: fabricfiles
+                  mountPath: /var/hyperledger/orderer/msp
+                  subPath: organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp
+    
+  service:
+    name: orderer
+    labels: orderer
+    type: ClusterIP
+    ports:
+        - protocol: TCP
+          port: 7050
+          name: grpc
+        - protocol: TCP
+          port: 7053
+          name: admin
+        - protocol: TCP
+          port: 9443
+          name: metrics    
+
+
+
+
+
+orderer2:
+  name: orderer2
+  labels: orderer2
+  container:
+      name: orderer2
+      image: hyperledger/fabric-orderer:2.3
+      imagepullpolicy: IfNotPresent
+      requests:
+        memory: "200Mi"
+        cpu: "150m"
+      limits:
+        memory: "250Mi"
+        cpu: "250m"
+      env:
+                - name: CONFIGTX_ORDERER_ADDRESSES
+                  value: "orderer2:7050"
+                - name: ORDERER_GENERAL_LISTENADDRESS
+                  value: "0.0.0.0"
+                - name: ORDERER_GENERAL_LISTENPORT
+                  value: "7050"
+                - name: ORDERER_GENERAL_LOGLEVEL
+                  value: debug
+                - name: ORDERER_GENERAL_LOCALMSPDIR
+                  value: /organizations/ordererOrganizations/example.com/orderers/orderer2.example.com/msp
+                - name: ORDERER_GENERAL_LOCALMSPID
+                  value: OrdererMSP
+                - name: ORDERER_GENERAL_GENESISMETHOD
+                  value: file
+                - name: ORDERER_GENERAL_GENESISFILE
+                  value: /system-genesis-block/genesis.block
+                - name: ORDERER_GENERAL_TLS_ENABLED
+                  value: "true"
+                - name: ORDERER_GENERAL_TLS_PRIVATEKEY
+                  value: /organizations/ordererOrganizations/example.com/orderers/orderer2.example.com/tls/server.key
+                - name: ORDERER_GENERAL_TLS_CERTIFICATE
+                  value: /organizations/ordererOrganizations/example.com/orderers/orderer2.example.com/tls/server.crt
+                - name: ORDERER_GENERAL_TLS_ROOTCAS
+                  value: /organizations/ordererOrganizations/example.com/orderers/orderer2.example.com/tls/ca.crt
+                - name:  ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY
+                  value: /organizations/ordererOrganizations/example.com/orderers/orderer2.example.com/tls/server.key
+                - name:  ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE
+                  value: /organizations/ordererOrganizations/example.com/orderers/orderer2.example.com/tls/server.crt
+                - name: ORDERER_GENERAL_BOOTSTRAPMETHOD
+                  value: none
+                - name: ORDERER_CHANNELPARTICIPATION_ENABLED
+                  value: "true"  
+                - name: ORDERER_ADMIN_TLS_CERTIFICATE
+                  value: /var/hyperledger/orderer/tls/server.crt
+                - name: ORDERER_ADMIN_TLS_PRIVATEKEY
+                  value: /var/hyperledger/orderer/tls/server.key
+                - name: ORDERER_ADMIN_TLS_ROOTCAS
+                  value: /var/hyperledger/orderer/tls/ca.crt
+                - name: ORDERER_ADMIN_TLS_CLIENTROOTCAS
+                  value: /var/hyperledger/orderer/tls/ca.crt
+                - name: ORDERER_ADMIN_LISTENADDRESS
+                  value: "0.0.0.0:7053"       
+      
+  volume:
+    name: fabricfiles
+    claimname: mypvc
+    volumeMounts:
+                - name:  fabricfiles
+                  mountPath:  /organizations
+                  subPath: organizations
+          
+                - name: fabricfiles
+                  mountPath: /system-genesis-block
+                  subPath: system-genesis-block
+    
+  service:
+    name: orderer2
+    labels: orderer2
+    type: ClusterIP
+    ports:
+        - protocol: TCP
+          port: 7050
+          name: grpc     
+
+
+
+
+
+
+
+orderer3:
+  name: orderer3
+  labels: orderer3
+  container:
+      name: orderer3
+      image: hyperledger/fabric-orderer:2.3
+      imagepullpolicy: IfNotPresent
+      requests:
+        memory: "200Mi"
+        cpu: "150m"
+      limits:
+        memory: "250Mi"
+        cpu: "250m"
+      env:
+                - name: CONFIGTX_ORDERER_ADDRESSES
+                  value: "orderer3:7050"
+                - name: ORDERER_GENERAL_LISTENADDRESS
+                  value: "0.0.0.0"
+                - name: ORDERER_GENERAL_LISTENPORT
+                  value: "7050"
+                - name: ORDERER_GENERAL_LOGLEVEL
+                  value: debug
+                - name: ORDERER_GENERAL_LOCALMSPDIR
+                  value: /organizations/ordererOrganizations/example.com/orderers/orderer3.example.com/msp
+                - name: ORDERER_GENERAL_LOCALMSPID
+                  value: OrdererMSP
+                - name: ORDERER_GENERAL_GENESISMETHOD
+                  value: file
+                - name: ORDERER_GENERAL_GENESISFILE
+                  value: /system-genesis-block/genesis.block
+                - name: ORDERER_GENERAL_TLS_ENABLED
+                  value: "true"
+                - name: ORDERER_GENERAL_TLS_PRIVATEKEY
+                  value: /organizations/ordererOrganizations/example.com/orderers/orderer3.example.com/tls/server.key
+                - name: ORDERER_GENERAL_TLS_CERTIFICATE
+                  value: /organizations/ordererOrganizations/example.com/orderers/orderer3.example.com/tls/server.crt
+                - name: ORDERER_GENERAL_TLS_ROOTCAS
+                  value: /organizations/ordererOrganizations/example.com/orderers/orderer3.example.com/tls/ca.crt
+                - name:  ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY
+                  value: /organizations/ordererOrganizations/example.com/orderers/orderer3.example.com/tls/server.key
+                - name:  ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE
+                  value: /organizations/ordererOrganizations/example.com/orderers/orderer3.example.com/tls/server.crt
+                - name: ORDERER_GENERAL_BOOTSTRAPMETHOD
+                  value: none
+                - name: ORDERER_CHANNELPARTICIPATION_ENABLED
+                  value: "true"  
+                - name: ORDERER_ADMIN_TLS_CERTIFICATE
+                  value: /var/hyperledger/orderer/tls/server.crt
+                - name: ORDERER_ADMIN_TLS_PRIVATEKEY
+                  value: /var/hyperledger/orderer/tls/server.key
+                - name: ORDERER_ADMIN_TLS_ROOTCAS
+                  value: /var/hyperledger/orderer/tls/ca.crt
+                - name: ORDERER_ADMIN_TLS_CLIENTROOTCAS
+                  value: /var/hyperledger/orderer/tls/ca.crt
+                - name: ORDERER_ADMIN_LISTENADDRESS
+                  value: "0.0.0.0:7053"     
+      
+  volume:
+    name: fabricfiles
+    claimname: mypvc
+    volumeMounts:
+                - name:  fabricfiles
+                  mountPath:  /organizations
+                  subPath: organizations
+          
+                - name: fabricfiles
+                  mountPath: /system-genesis-block
+                  subPath: system-genesis-block
+    
+  service:
+    name: orderer3
+    labels: orderer3
+    type: ClusterIP
+    ports:
+        - protocol: TCP
+          port: 7050
+          name: grpc   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+orderer4:
+  name: orderer4
+  labels: orderer4
+  container:
+      name: orderer4
+      image: hyperledger/fabric-orderer:2.3
+      imagepullpolicy: IfNotPresent
+      requests:
+        memory: "200Mi"
+        cpu: "150m"
+      limits:
+        memory: "250Mi"
+        cpu: "250m"
+      env:
+                - name: CONFIGTX_ORDERER_ADDRESSES
+                  value: "orderer4:7050"
+                - name: ORDERER_GENERAL_LISTENADDRESS
+                  value: "0.0.0.0"
+                - name: ORDERER_GENERAL_LISTENPORT
+                  value: "7050"
+                - name: ORDERER_GENERAL_LOGLEVEL
+                  value: debug
+                - name: ORDERER_GENERAL_LOCALMSPDIR
+                  value: /organizations/ordererOrganizations/example.com/orderers/orderer4.example.com/msp
+                - name: ORDERER_GENERAL_LOCALMSPID
+                  value: OrdererMSP
+                - name: ORDERER_GENERAL_GENESISMETHOD
+                  value: file
+                - name: ORDERER_GENERAL_GENESISFILE
+                  value: /system-genesis-block/genesis.block
+                - name: ORDERER_GENERAL_TLS_ENABLED
+                  value: "true"
+                - name: ORDERER_GENERAL_TLS_PRIVATEKEY
+                  value: /organizations/ordererOrganizations/example.com/orderers/orderer4.example.com/tls/server.key
+                - name: ORDERER_GENERAL_TLS_CERTIFICATE
+                  value: /organizations/ordererOrganizations/example.com/orderers/orderer4.example.com/tls/server.crt
+                - name: ORDERER_GENERAL_TLS_ROOTCAS
+                  value: /organizations/ordererOrganizations/example.com/orderers/orderer4.example.com/tls/ca.crt
+                - name:  ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY
+                  value: /organizations/ordererOrganizations/example.com/orderers/orderer4.example.com/tls/server.key
+                - name:  ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE
+                  value: /organizations/ordererOrganizations/example.com/orderers/orderer4.example.com/tls/server.crt
+                - name: ORDERER_GENERAL_BOOTSTRAPMETHOD
+                  value: none
+                - name: ORDERER_CHANNELPARTICIPATION_ENABLED
+                  value: "true"  
+                - name: ORDERER_ADMIN_TLS_CERTIFICATE
+                  value: /var/hyperledger/orderer/tls/server.crt
+                - name: ORDERER_ADMIN_TLS_PRIVATEKEY
+                  value: /var/hyperledger/orderer/tls/server.key
+                - name: ORDERER_ADMIN_TLS_ROOTCAS
+                  value: /var/hyperledger/orderer/tls/ca.crt
+                - name: ORDERER_ADMIN_TLS_CLIENTROOTCAS
+                  value: /var/hyperledger/orderer/tls/ca.crt
+                - name: ORDERER_ADMIN_LISTENADDRESS
+                  value: "0.0.0.0:7053"                  
+      
+  volume:
+    name: fabricfiles
+    claimname: mypvc
+    volumeMounts:
+                - name:  fabricfiles
+                  mountPath:  /organizations
+                  subPath: organizations
+          
+                - name: fabricfiles
+                  mountPath: /system-genesis-block
+                  subPath: system-genesis-block
+    
+  service:
+    name: orderer4
+    labels: orderer4
+    type: ClusterIP
+    ports:
+        - protocol: TCP
+          port: 7050
+          name: grpc
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+ 
+ 
+ 
+orderer5:
+  name: orderer5
+  labels: orderer5
+  container:
+      name: orderer5
+      image: hyperledger/fabric-orderer:2.3
+      imagepullpolicy: IfNotPresent
+      requests:
+        memory: "200Mi"
+        cpu: "150m"
+      limits:
+        memory: "250Mi"
+        cpu: "250m"
+      env:
+                - name: CONFIGTX_ORDERER_ADDRESSES
+                  value: "orderer5:7050"
+                - name: ORDERER_GENERAL_LISTENADDRESS
+                  value: "0.0.0.0"
+                - name: ORDERER_GENERAL_LISTENPORT
+                  value: "7050"
+                - name: ORDERER_GENERAL_LOGLEVEL
+                  value: debug
+                - name: ORDERER_GENERAL_LOCALMSPDIR
+                  value: /organizations/ordererOrganizations/example.com/orderers/orderer5.example.com/msp
+                - name: ORDERER_GENERAL_LOCALMSPID
+                  value: OrdererMSP
+                - name: ORDERER_GENERAL_GENESISMETHOD
+                  value: file
+                - name: ORDERER_GENERAL_GENESISFILE
+                  value: /system-genesis-block/genesis.block
+                - name: ORDERER_GENERAL_TLS_ENABLED
+                  value: "true"
+                - name: ORDERER_GENERAL_TLS_PRIVATEKEY
+                  value: /organizations/ordererOrganizations/example.com/orderers/orderer5.example.com/tls/server.key
+                - name: ORDERER_GENERAL_TLS_CERTIFICATE
+                  value: /organizations/ordererOrganizations/example.com/orderers/orderer5.example.com/tls/server.crt
+                - name: ORDERER_GENERAL_TLS_ROOTCAS
+                  value: /organizations/ordererOrganizations/example.com/orderers/orderer5.example.com/tls/ca.crt
+                - name:  ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY
+                  value: /organizations/ordererOrganizations/example.com/orderers/orderer5.example.com/tls/server.key
+                - name:  ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE
+                  value: /organizations/ordererOrganizations/example.com/orderers/orderer5.example.com/tls/server.crt
+                - name: ORDERER_GENERAL_BOOTSTRAPMETHOD
+                  value: none
+                - name: ORDERER_CHANNELPARTICIPATION_ENABLED
+                  value: "true"  
+                - name: ORDERER_ADMIN_TLS_CERTIFICATE
+                  value: /var/hyperledger/orderer/tls/server.crt
+                - name: ORDERER_ADMIN_TLS_PRIVATEKEY
+                  value: /var/hyperledger/orderer/tls/server.key
+                - name: ORDERER_ADMIN_TLS_ROOTCAS
+                  value: /var/hyperledger/orderer/tls/ca.crt
+                - name: ORDERER_ADMIN_TLS_CLIENTROOTCAS
+                  value: /var/hyperledger/orderer/tls/ca.crt
+                - name: ORDERER_ADMIN_LISTENADDRESS
+                  value: "0.0.0.0:7053"                               
+      
+  volume:
+    name: fabricfiles
+    claimname: mypvc
+    volumeMounts:
+                - name:  fabricfiles
+                  mountPath:  /organizations
+                  subPath: organizations
+          
+                - name: fabricfiles
+                  mountPath: /system-genesis-block
+                  subPath: system-genesis-block
+    
+  service:
+    name: orderer5
+    labels: orderer5
+    type: ClusterIP
+    ports:
+        - protocol: TCP
+          port: 7050
+          name: grpc
+ 

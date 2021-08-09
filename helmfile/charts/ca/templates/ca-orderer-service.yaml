@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.orderer.service.name }}
+  
+  labels:
+    app: {{ .Values.orderer.service.labels }}
+spec:
+  type: {{ .Values.orderer.service.type }}
+  selector:
+    app: {{ .Values.orderer.service.labels }}
+  ports:
+    - protocol: {{ .Values.orderer.service.ports.protocol }}
+      targetPort: {{ .Values.orderer.service.ports.targetport }}
+      port: {{ .Values.orderer.service.ports.port }}

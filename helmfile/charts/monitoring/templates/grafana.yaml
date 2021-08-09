@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.grafana.name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.grafana.labels }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.grafana.labels }}
+    spec:
+      volumes:
+        - name: grafana-config
+          configMap: 
+           name: grafana-config
+           items:
+              - key: datasource.yml
+                path: datasource.yml
+              - key: dashboard.json
+                path: dashboard.json
+              - key: dashboard.yaml
+                path: dashboard.yaml
+      containers:
+      - name: {{ .Values.grafana.container.name }}
+        image: {{ .Values.grafana.container.image }}
+        env:
+          {{- range $k, $v := .Values.grafana.container.env }} 
+             - {{ . | toYaml | indent 15 | trim }}
+            {{- end }}
+        resources:
+          limits:
+            memory: "{{ .Values.grafana.container.limits.memory }}"
+            cpu: "{{ .Values.grafana.container.limits.cpu }}"
+        ports:
+          {{- range $k, $v := .Values.grafana.container.ports }} 
+              - {{ . | toYaml | indent 19 | trim }}
+             {{- end }}
+        volumeMounts:
+          {{- range $k, $v := .Values.grafana.container.volumeMounts }} 
+               - {{ . | toYaml | indent 17 | trim }}
+              {{- end }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.grafana.service.name }}
+spec:
+  selector:
+    app: {{ .Values.grafana.service.labels }}
+  ports:
+          {{- range $k, $v := .Values.grafana.service.ports }} 
+               - {{ . | toYaml | indent 17 | trim }}
+              {{- end }}
+
+
+

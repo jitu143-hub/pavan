@@ -1,0 +1,30 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: peer0-org1
+  labels:
+    app: peer0-org1
+spec:
+  selector:
+    name: {{ .Values.peer0org1.service.name }}
+  type: {{ .Values.peer0org1.service.type }}
+  ports:
+       {{- range $k, $v := .Values.peer0org1.service.ports }} 
+       - {{ . | toYaml | indent 9 | trim }}
+       {{- end }} 
+
+---
+#---------------- Peer0 Org1 Metrics Service ---------------
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ .Values.peer0org1cli.service.name }}
+    metrics-service: "true"
+  name: {{ .Values.peer0org1cli.service.labels }}
+spec:
+  type: {{ .Values.peer0org1cli.service.type }}
+  ports:
+       {{- range $k, $v := .Values.peer0org1cli.service.ports }} 
+       - {{ . | toYaml | indent 9 | trim }}
+       {{- end }}

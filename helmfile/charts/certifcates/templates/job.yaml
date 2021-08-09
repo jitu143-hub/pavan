@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Values.certs.name }}
+spec:
+  parallelism: {{ .Values.certs.parallelism }}
+  completions: {{ .Values.certs.completions }}
+  template:
+    metadata:
+      name: {{ .Values.certs.name }}
+    spec:
+      volumes:
+        - name: {{ .Values.certs.volume.name }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.certs.volume.claimname }}
+      containers:
+        - name: {{ .Values.certs.container.name }}
+          image: {{ .Values.certs.container.image }}
+          resources:
+            requests:
+              memory: "{{ .Values.certs.container.requests.memory }}"
+              cpu: "{{ .Values.certs.container.requests.cpu }}"
+            limits:
+              memory: "{{ .Values.certs.container.limits.memory }}"
+              cpu: "{{ .Values.certs.container.limits.cpu }}"
+          volumeMounts:
+              {{- range $k, $v := .Values.certs.container.volumeMounts }}
+               - {{ . | toYaml | indent 17 | trim }}
+              {{- end }} 
+          command:
+            - /bin/sh
+            - -c
+            - |
+              ./scripts/orderer-certs.sh &&
+              ./scripts/org1-certs.sh &&
+              ./scripts/org2-certs.sh &&
+              ./scripts/org3-certs.sh
+      restartPolicy: {{ .Values.certs.restartpolicy }}

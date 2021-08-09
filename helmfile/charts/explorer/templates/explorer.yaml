@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.explorer.name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.explorer.labels }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.explorer.labels }}
+    spec:
+      volumes:
+        - name: fabricfiles
+          persistentVolumeClaim:
+            claimName: mypvc
+        - name: explorer-config
+          configMap:
+            name: explorer-config
+            items:
+              - key: config.json
+                path: config.json
+              - key: network.json
+                path: network.json
+      containers:
+        - name: {{ .Values.explorer.container.name }}
+          image: {{ .Values.explorer.container.image }}
+          env:
+           {{- range $k, $v := .Values.explorer.container.env }}
+            - {{ . | toYaml | indent 14 | trim }}
+           {{- end }} 
+          resources:
+            limits:
+              memory: "{{ .Values.explorer.container.limits.memory }}"
+              cpu: "{{ .Values.explorer.container.limits.cpu }}"
+          ports:
+            - containerPort: "{{ .Values.explorer.container.ports.containerPort }}"
+          volumeMounts:
+             {{- range $k, $v := .Values.explorer.container.volumeMounts }} 
+              - {{ . | toYaml | indent 16 | trim }}
+             {{- end }}  
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.explorer.service.name }}
+spec:
+  selector:
+    app: {{ .Values.explorer.service.labels }}
+  ports:
+     {{- range $k, $v := .Values.explorer.service.ports }}
+      - {{ . | toYaml | indent 8 | trim }}
+     {{- end }}

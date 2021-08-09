@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.org3.name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.org3.labels }}
+  replicas: {{ .Values.replicacount }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.org3.labels }}
+    spec:
+      volumes:
+        - name: {{ .Values.org3.volume.name }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.org3.volume.claimname }}
+      containers:
+
+        - name: {{ .Values.org3.container.name }}
+          image: {{ .Values.org3.container.image }}
+          imagePullPolicy: "{{ .Values.org3.container.imagepullpolicy }}"
+          command:
+            [
+              "fabric-ca-server" ,
+              "start", "-b" ,"admin:adminpw","--port","9054", "-d"
+            ]
+          resources:
+            requests:
+              memory: "{{ .Values.org3.container.requests.memory }}"
+              cpu: "{{ .Values.org3.container.requests.cpu }}"
+            limits:
+              memory: "{{ .Values.org3.container.limits.memory }}"
+              cpu: "{{ .Values.org3.container.limits.cpu }}"
+          env:
+            {{- range $k, $v := .Values.org3.container.env }}
+             - {{ . | toYaml | indent 15 | trim }}
+            {{- end }} 
+          volumeMounts:
+            - name: {{ .Values.org3.volume.name }}
+              mountPath: {{ .Values.org3.volume.mountpath }}
+              subPath: {{ .Values.org3.volume.subpath }}

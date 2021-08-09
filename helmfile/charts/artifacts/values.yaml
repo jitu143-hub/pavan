@@ -1,0 +1,29 @@
+
+artifacts:
+  name: artifacts
+  parallelism: 1
+  completions: 1
+  container:
+      name: artifacts
+      image: hyperledger/fabric-tools:2.3
+      workingDir: /
+      volumemounts:
+            - mountpath: /organizations
+              name: fabricfiles
+              subpath: organizations
+            - mountpath: /configtx
+              name: fabricfiles
+              subpath: configtx
+            - mountpath: /system-genesis-block
+              name: fabricfiles
+              subpath: system-genesis-block
+            - mountpath: /channel-artifacts
+              name: fabricfiles
+              subpath: channel-artifacts
+            - mountpath: /scripts
+              name: fabricfiles
+              subpath: scripts      
+  restartpolicy: Never     
+  volume:
+    name: fabricfiles
+    claimname: mypvc

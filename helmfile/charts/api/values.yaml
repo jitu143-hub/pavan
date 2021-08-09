@@ -1,0 +1,40 @@
+replicacount: 1
+
+api:
+  name: api
+  labels: api
+  container:
+      name: api
+      image: adityajoshi12/api:1.0
+      imagePullPolicy: Always
+      requests:
+        memory: "400Mi"
+        cpu: "300m"
+      limits:
+        memory: "450Mi"
+        cpu: "400m"
+      
+      volumeMounts:
+            - name: data
+              mountPath: /usr/src/app/connection-profile
+              subPath: connection-profile
+            - name: data
+              mountPath: /organizations
+              subPath: organizations
+            - name: data
+              mountPath: /usr/src/app/wallet
+              subPath: wallet
+            - mountPath: /usr/src/app/config.json
+              name: ca-client-config
+              subPath: config.json  
+  
+  service:
+    name: api
+    labels: api
+    type: ClusterIP
+    ports:
+        - protocol: TCP
+          port: 4000
+          targetport: 4000
+    selector: 
+    name: api

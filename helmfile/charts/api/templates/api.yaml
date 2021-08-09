@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.api.name }}
+spec:
+  replicas: {{ .Values.replicacount }}
+  selector:
+    matchLabels:
+      name: {{ .Values.api.labels }}
+  template:
+    metadata:
+      labels:
+        name: {{ .Values.api.labels }}
+    spec:
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: mypvc
+        - name: ca-client-config
+          configMap:
+            name: ca-client-config
+            items:
+              - key: config.json
+                path: config.json
+                mode: 0544
+      containers:
+        - name: {{ .Values.api.container.name }}
+          stdin: true
+          tty: true
+          resources:
+            limits:
+              memory: "{{ .Values.api.container.limits.memory }}"
+              cpu: "{{ .Values.api.container.limits.cpu }}"
+            requests:
+              memory: "{{ .Values.api.container.requests.memory }}"
+              cpu: "{{ .Values.api.container.requests.cpu }}"
+          image: {{ .Values.api.container.image }}
+          imagePullPolicy: {{ .Values.api.container.imagePullPolicy }}
+          volumeMounts:
+            {{- range $k, $v := .Values.api.container.volumeMounts }} 
+               - {{ . | toYaml | indent 17 | trim }}
+              {{- end }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ .Values.api.service.labels }}
+  name: {{ .Values.api.service.name }}
+spec:
+  type: {{ .Values.api.service.type }}
+  ports:
+     {{- range $k, $v := .Values.api.service.ports }} 
+       - {{ . | toYaml | indent 9 | trim }}
+     {{- end }}
+  selector:
+    name: {{ .Values.api.service.name }}

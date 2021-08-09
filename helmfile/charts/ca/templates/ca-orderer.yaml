@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.orderer.name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.orderer.name }}
+  replicas: {{ .Values.replicacount }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.orderer.name }}
+    spec:
+      volumes:
+        - name: {{ .Values.orderer.volume.name }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.orderer.volume.claimname }}
+      containers:
+
+        - name: {{ .Values.orderer.container.name }}
+          image: {{ .Values.orderer.container.image }}
+          imagePullPolicy: "{{ .Values.orderer.container.imagepullpolicy }}"
+          command:
+            [
+              "fabric-ca-server" ,
+              "start", "-b" ,"admin:adminpw","--port","10054", "-d"
+            ]
+          resources:
+            requests:
+              memory: "{{ .Values.orderer.container.requests.memory }}"
+              cpu: "{{ .Values.orderer.container.requests.cpu }}"
+            limits:
+              memory: "{{ .Values.orderer.container.limits.memory }}"
+              cpu: "{{ .Values.orderer.container.limits.cpu }}"
+          env:
+            {{- range $k, $v := .Values.orderer.container.env }}
+             - {{ . | toYaml | indent 15 | trim }}
+            {{- end }}                       
+          volumeMounts:
+            - name: {{ .Values.orderer.volume.name }}
+              mountPath: {{ .Values.orderer.volume.mountpath }}
+              subPath: {{ .Values.orderer.volume.subpath }}

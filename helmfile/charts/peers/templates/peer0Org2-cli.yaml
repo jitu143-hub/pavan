@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: {{ .Values.peer0org2cli.name }}
+spec:
+    selector:
+        matchLabels:
+            name: {{ .Values.peer0org2cli.labels }}
+    template:
+        metadata:
+            labels:
+                name: {{ .Values.peer0org2cli.labels }}
+        spec:
+            volumes:
+                - name: fabricfiles
+                  persistentVolumeClaim:
+                      claimName: mypvc
+
+            containers:
+                - name: {{ .Values.peer0org2cli.container.name }}
+                  stdin: true
+                  tty: true
+                  resources:
+                        limits:
+                          memory: "{{ .Values.peer0org2cli.container.limits.memory }}"
+                          cpu: "{{ .Values.peer0org2cli.container.limits.cpu }}"
+                        requests:
+                          memory: "{{ .Values.peer0org2cli.container.requests.memory }}"
+                          cpu: "{{ .Values.peer0org2cli.container.requests.cpu }}"
+                  image: {{ .Values.peer0org2cli.container.image }}
+                  workingDir: {{ .Values.peer0org2cli.container.workingDir }}
+                  env:
+                    {{- range $k, $v := .Values.peer0org2cli.container.env }} 
+                     - {{ . | toYaml | indent 23 | trim }}
+                    {{- end }} 
+                  volumeMounts:
+                    {{- range $k, $v := .Values.peer0org2cli.container.volumeMounts }} 
+                     - {{ . | toYaml | indent 23 | trim }}
+                    {{- end }} 
